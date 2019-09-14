@@ -1,0 +1,24 @@
+- hosts: masters
+  become: yes
+  gather_facts: false
+  tasks:
+
+    - name: get join command
+      command: cat /var/lib/rancher/k3s/server/node-token
+      register: token_string
+
+    - debug: msg="{{ token_string.stdout }}"
+
+    - name: set join command
+      set_fact:
+        join_command: "{{ token_string.stdout }}"
+
+
+- hosts: workers
+  become: yes
+  tasks:
+
+    - name: install k3s
+      shell: export K3S_TOKEN="{{ hostvars['k8s-master'].join_command }}" && export K3S_URL="https://192.168.1.100:6443" && curl -sfL https://get.k3s.io | sh -
+      become: yes
+      become_user: pi

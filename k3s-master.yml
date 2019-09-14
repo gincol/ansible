@@ -1,0 +1,14 @@
+- hosts: masters
+  become: yes
+  tasks:
+
+    - name: install ks3
+      shell: curl -sfL https://get.k3s.io | sh -
+      args:
+        warn: no
+
+    - name: enable k3s
+      service:
+        name: k3s
+        enabled: yes
+

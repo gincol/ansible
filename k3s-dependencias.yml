@@ -1,0 +1,25 @@
+- hosts: all
+  become: yes
+  tasks:
+
+    - name: install Docker
+      shell: curl -sSL get.docker.com | sh -
+      args:
+        warn: no
+
+    - name: add user pi to group docker
+      user:
+        name: pi
+        groups: docker
+        append: yes
+    
+    - name: disable swapp
+      command: "{{ item }}"
+      with_items:
+        - systemctl disable dphys-swapfile
+        - dphys-swapfile swapoff
+        - dphys-swapfile uninstall
+        - update-rc.d dphys-swapfile remove
+ 
+    - name: Reboot
+      reboot:
